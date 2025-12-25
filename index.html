@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🎄 圣诞快乐</title>
+  <style>
+    :root{
+      --bg1:#081a2b;
+      --bg2:#0f2d3f;
+      --text:#eaf6ff;
+      --muted:#b7d9ff;
+      --tree1:#0f6b3a;
+      --tree2:#0b4f2b;
+      --trunk:#6b3f2a;
+      --gold:#ffd36a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 50% 25%, #163e59 0%, var(--bg2) 35%, var(--bg1) 100%);
+      overflow:hidden;
+    }
+    .wrap{
+      position:relative;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    canvas#snow{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      pointer-events:none;
+    }
+    .card{
+      position:relative;
+      width:min(520px, 92vw);
+      border-radius:24px;
+      padding:24px 22px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+    }
+    .title{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:0.3px;
+      margin:0 0 8px;
+      display:flex; gap:10px; align-items:center;
+    }
+    .subtitle{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    /* Tree */
+    .tree-area{
+      position:relative;
+      display:flex;
+      justify-content:center;
+      padding:8px 0 18px;
+    }
+    .tree{
+      position:relative;
+      width:260px;
+      height:340px;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,0.45));
+    }
+    .star{
+      position:absolute;
+      top:-8px; left:50%;
+      transform:translateX(-50%);
+      width:52px; height:52px;
+      background: conic-gradient(from 0deg, #fff3c4, var(--gold), #fff3c4);
+      clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 91%,
+        50% 70%,
+        21% 91%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+      );
+      animation: twinkle 1.8s infinite ease-in-out;
+    }
+    @keyframes twinkle{
+      0%,100%{ transform:translateX(-50%) scale(1); filter:brightness(1.05); }
+      50%{ transform:translateX(-50%) scale(1.08); filter:brightness(1.35); }
+    }
+
+    .layer{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      height:0;
+      border-left: 0 solid transparent;
+      border-right: 0 solid transparent;
+      border-bottom: 0 solid transparent;
+      border-radius:14px;
+    }
+    .l1{ top:35px;  border-left:120px solid transparent; border-right:120px solid transparent; border-bottom:140px solid var(--tree1); }
+    .l2{ top:95px;  border-left:140px solid transparent; border-right:140px solid transparent; border-bottom:165px solid var(--tree2); }
+    .l3{ top:170px; border-left:160px solid transparent; border-right:160px solid transparent; border-bottom:185px solid var(--tree1); }
+
+    .trunk{
+      position:absolute;
+      bottom:18px; left:50%;
+      transform:translateX(-50%);
+      width:68px; height:78px;
+      background: linear-gradient(180deg, #7b4a33, var(--trunk));
+      border-radius:14px;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08);
+    }
+    .base{
+      position:absolute;
+      bottom:0; left:50%;
+      transform:translateX(-50%);
+      width:240px; height:18px;
+      background: rgba(255,255,255,0.15);
+      border-radius:999px;
+      filter: blur(0.2px);
+    }
+
+    /* Garland line */
+    .garland{
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      width:240px; height:210px;
+      top:64px;
+      pointer-events:none;
+    }
+    .garland::before{
+      content:"";
+      position:absolute; inset:0;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-top:none; border-left:none; border-right:none;
+      border-radius:0 0 240px 240px;
+      transform: rotate(-8deg);
+    }
+    .garland.g2{ top:125px; width:270px; height:235px; opacity:0.95; transform:translateX(-50%) rotate(4deg); }
+    .garland.g3{ top:185px; width:300px; height:250px; opacity:0.9; transform:translateX(-50%) rotate(-2deg); }
+
+    /* Lights */
+    .light{
+      position:absolute;
+      width:14px; height:14px;
+      border-radius:50%;
+      box-shadow: 0 0 18px rgba(255,255,255,0.35);
+      opacity:0.95;
+      animation: blink 1.6s infinite ease-in-out;
+    }
+    @keyframes blink{
+      0%,100%{ transform:scale(1); filter:brightness(1); opacity:0.9; }
+      50%{ transform:scale(1.15); filter:brightness(1.4); opacity:1; }
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:10px;
+      padding-top:12px;
+      border-top:1px solid rgba(255,255,255,0.12);
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color:var(--text);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn:hover{ transform:translateY(-1px); background: rgba(255,255,255,0.14); }
+    .hint{ color:rgba(234,246,255,0.82); font-size:12px; line-height:1.45; }
+    .footer{
+      margin-top:10px;
+      color:rgba(234,246,255,0.75);
+      font-size:12px;
+      text-align:center;
+    }
+    .footer b{ color: #ffffff; }
+  </style>
+</head>
+<body>
+  <canvas id="snow"></canvas>
+
+  <div class="wrap">
+    <div class="card">
+      <h1 class="title">🎄 圣诞快乐！</h1>
+      <p class="subtitle" id="msg">
+        愿你今夜被温柔照亮，平安喜乐，心想事成 ✨
+      </p>
+
+      <div class="tree-area">
+        <div class="tree" id="tree">
+          <div class="star"></div>
+
+          <div class="layer l1"></div>
+          <div class="layer l2"></div>
+          <div class="layer l3"></div>
+
+          <div class="garland g1"></div>
+          <div class="garland g2"></div>
+          <div class="garland g3"></div>
+
+          <div class="trunk"></div>
+          <div class="base"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="changeText">改祝福语</button>
+        <button class="btn" id="toggleSnow">开关雪花</button>
+        <span class="hint">提示：你也可以把祝福语写进链接里（见下方说明）。</span>
+      </div>
+
+      <div class="footer">Made with <b>❤️</b> — 直接发链接，对方点开就能看</div>
+    </div>
+  </div>
+
+<script>
+/** ========= 1) 生成彩灯 ========= */
+(function initLights(){
+  const tree = document.getElementById('tree');
+  const colors = ["#ff5b5b","#ffd36a","#64d6ff","#7dff9a","#c68cff","#ff9ad5"];
+  // 预设一些灯的位置（相对 tree 容器）
+  const points = [
+    // 上层
+    [130, 70],[105, 88],[155, 92],[130, 110],
+    // 中层
+    [88, 140],[170, 142],[115, 158],[145, 168],[130, 186],
+    // 下层
+    [70, 220],[190, 220],[100, 240],[160, 250],[130, 268],[85, 290],[175, 292]
+  ];
+
+  points.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'light';
+    d.style.left = (p[0]-7) + 'px';
+    d.style.top  = (p[1]-7) + 'px';
+    d.style.background = colors[i % colors.length];
+    d.style.animationDelay = (Math.random()*1.2).toFixed(2) + 's';
+    d.style.boxShadow = `0 0 18px ${colors[i % colors.length]}55`;
+    tree.appendChild(d);
+  });
+
+  // 每隔一段时间随机换色，更“圣诞灯”一点
+  setInterval(() => {
+    const lights = tree.querySelectorAll('.light');
+    lights.forEach((l) => {
+      if (Math.random() < 0.35) {
+        const c = colors[(Math.random()*colors.length)|0];
+        l.style.background = c;
+        l.style.boxShadow = `0 0 18px ${c}55`;
+      }
+    });
+  }, 900);
+})();
+
+/** ========= 2) 雪花动画（Canvas） ========= */
+const canvas = document.getElementById('snow');
+const ctx = canvas.getContext('2d');
+let W, H, snowOn = true;
+
+function resize(){
+  W = canvas.width = window.innerWidth * devicePixelRatio;
+  H = canvas.height = window.innerHeight * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+}
+let scaledOnce = false;
+function safeResize(){
+  // 防止多次 scale 叠加
+  if (scaledOnce) ctx.setTransform(1,0,0,1,0,0);
+  resize();
+  scaledOnce = true;
+}
+safeResize();
+window.addEventListener('resize', safeResize);
+
+const flakes = Array.from({length: 120}, () => ({
+  x: Math.random()*window.innerWidth,
+  y: Math.random()*window.innerHeight,
+  r: 0.8 + Math.random()*2.2,
+  v: 0.6 + Math.random()*1.6,
+  drift: (Math.random()*1.2 - 0.6)
+}));
+
+function draw(){
+  if (!snowOn) {
+    ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    requestAnimationFrame(draw);
+    return;
+  }
+  ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+  ctx.globalAlpha = 0.9;
+
+  for (const f of flakes){
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fill();
+
+    f.y += f.v;
+    f.x += f.drift;
+
+    if (f.y > window.innerHeight + 10) {
+      f.y = -10;
+      f.x = Math.random()*window.innerWidth;
+    }
+    if (f.x > window.innerWidth + 10) f.x = -10;
+    if (f.x < -10) f.x = window.innerWidth + 10;
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+/** ========= 3) 祝福语：支持从链接参数读取 =========
+  例如： https://xxx/index.html?msg=圣诞快乐%20Lisa
+*/
+function getParam(name){
+  const u = new URL(location.href);
+  return u.searchParams.get(name);
+}
+const msgEl = document.getElementById('msg');
+const msgFromUrl = getParam('msg');
+if (msgFromUrl) msgEl.textContent = msgFromUrl;
+
+document.getElementById('changeText').addEventListener('click', () => {
+  const t = prompt('输入你想写的祝福语（对方打开网页就能看到）：', msgEl.textContent);
+  if (t && t.trim()) {
+    msgEl.textContent = t.trim();
+    // 顺便把祝福语写进链接参数，方便你复制“专属链接”发给别人
+    const u = new URL(location.href);
+    u.searchParams.set('msg', t.trim());
+    history.replaceState(null, '', u.toString());
+  }
+});
+
+document.getElementById('toggleSnow').addEventListener('click', () => {
+  snowOn = !snowOn;
+});
+</script>
+</body>
+</html>
