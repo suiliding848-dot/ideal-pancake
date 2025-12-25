@@ -205,7 +205,7 @@
     <div class="card">
       <h1 class="title">🎄 圣诞快乐！</h1>
       <p class="subtitle" id="msg">
-        愿你今夜被温柔照亮，平安喜乐，心想事成 ✨
+        廖家豪，平安喜乐，心想事成 ✨
       </p>
 
       <div class="tree-area">
@@ -342,15 +342,6 @@ const msgEl = document.getElementById('msg');
 const msgFromUrl = getParam('msg');
 if (msgFromUrl) msgEl.textContent = msgFromUrl;
 
-document.getElementById('changeText').addEventListener('click', () => {
-  const t = prompt('输入你想写的祝福语（对方打开网页就能看到）：', msgEl.textContent);
-  if (t && t.trim()) {
-    msgEl.textContent = t.trim();
-    // 顺便把祝福语写进链接参数，方便你复制“专属链接”发给别人
-    const u = new URL(location.href);
-    u.searchParams.set('msg', t.trim());
-    history.replaceState(null, '', u.toString());
-  }
 });
 
 document.getElementById('toggleSnow').addEventListener('click', () => {
@@ -359,3 +350,4 @@ document.getElementById('toggleSnow').addEventListener('click', () => {
 </script>
 </body>
 </html>
+
