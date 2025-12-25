@@ -166,29 +166,6 @@
       50%{ transform:scale(1.15); filter:brightness(1.4); opacity:1; }
     }
 
-    .controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      margin-top:10px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,0.12);
-    }
-    .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.10);
-      color:var(--text);
-      border-radius:14px;
-      padding:10px 12px;
-      cursor:pointer;
-      font-weight:700;
-      transition: transform .12s ease, background .12s ease;
-    }
-    .btn:hover{ transform:translateY(-1px); background: rgba(255,255,255,0.14); }
-    .hint{ color:rgba(234,246,255,0.82); font-size:12px; line-height:1.45; }
     .footer{
       margin-top:10px;
       color:rgba(234,246,255,0.75);
@@ -196,6 +173,44 @@
       text-align:center;
     }
     .footer b{ color: #ffffff; }
+
+    /* Love Heart */
+    .heart {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 300px;
+      color: red;
+      display: none;
+      animation: heartAnimation 1s ease-in-out infinite;
+    }
+    @keyframes heartAnimation {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* Buttons */
+    .btn {
+      appearance:none;
+      border:1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.10);
+      color:var(--text);
+      border-radius:14px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:16px;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn:hover{ transform:translateY(-1px); background: rgba(255,255,255,0.14); }
   </style>
 </head>
 <body>
@@ -226,27 +241,24 @@
       </div>
 
       <div class="controls">
-        <button class="btn" id="changeText">改祝福语</button>
         <button class="btn" id="toggleSnow">开关雪花</button>
-        <span class="hint">提示：你也可以把祝福语写进链接里（见下方说明）。</span>
+        <button class="btn" id="showHeart">❤️</button>
       </div>
 
-      <div class="footer">Made with <b>❤️</b> — 直接发链接，对方点开就能看</div>
+      <div class="footer">Made with <b>❤️</b></div>
     </div>
   </div>
+
+  <div class="heart" id="heart">❤️</div>
 
 <script>
 /** ========= 1) 生成彩灯 ========= */
 (function initLights(){
   const tree = document.getElementById('tree');
   const colors = ["#ff5b5b","#ffd36a","#64d6ff","#7dff9a","#c68cff","#ff9ad5"];
-  // 预设一些灯的位置（相对 tree 容器）
   const points = [
-    // 上层
     [130, 70],[105, 88],[155, 92],[130, 110],
-    // 中层
     [88, 140],[170, 142],[115, 158],[145, 168],[130, 186],
-    // 下层
     [70, 220],[190, 220],[100, 240],[160, 250],[130, 268],[85, 290],[175, 292]
   ];
 
@@ -261,7 +273,6 @@
     tree.appendChild(d);
   });
 
-  // 每隔一段时间随机换色，更“圣诞灯”一点
   setInterval(() => {
     const lights = tree.querySelectorAll('.light');
     lights.forEach((l) => {
@@ -274,7 +285,7 @@
   }, 900);
 })();
 
-/** ========= 2) 雪花动画（Canvas） ========= */
+/** ========= 2) 雪花动画 ========= */
 const canvas = document.getElementById('snow');
 const ctx = canvas.getContext('2d');
 let W, H, snowOn = true;
@@ -286,7 +297,6 @@ function resize(){
 }
 let scaledOnce = false;
 function safeResize(){
-  // 防止多次 scale 叠加
   if (scaledOnce) ctx.setTransform(1,0,0,1,0,0);
   resize();
   scaledOnce = true;
@@ -331,23 +341,16 @@ function draw(){
 }
 draw();
 
-/** ========= 3) 祝福语：支持从链接参数读取 =========
-  例如： https://xxx/index.html?msg=圣诞快乐%20Lisa
-*/
-function getParam(name){
-  const u = new URL(location.href);
-  return u.searchParams.get(name);
-}
-const msgEl = document.getElementById('msg');
-const msgFromUrl = getParam('msg');
-if (msgFromUrl) msgEl.textContent = msgFromUrl;
-
+/** ========= 3) 爱心按钮效果 ========= */
+document.getElementById('showHeart').addEventListener('click', () => {
+  const heart = document.getElementById('heart');
+  heart.style.display = heart.style.display === 'block' ? 'none' : 'block';
 });
 
+/** ========= 4) 开关雪花 ========= */
 document.getElementById('toggleSnow').addEventListener('click', () => {
   snowOn = !snowOn;
 });
 </script>
 </body>
 </html>
-
